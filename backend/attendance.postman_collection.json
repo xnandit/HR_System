@@ -1,0 +1,71 @@
+{
+  "info": {
+    "_postman_id": "attendance-collection-001",
+    "name": "Attendance API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection untuk testing endpoint absensi user (checkin, checkout, late)"
+  },
+  "item": [
+    {
+      "name": "Checkin Kantor Cabang 1 (Tepat Waktu)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"qrValue\": \"{\\\"type\\\":\\\"attendance_qr\\\",\\\"companyId\\\":1,\\\"companyName\\\":\\\"PT.A\\\",\\\"zonaId\\\":1,\\\"zonaName\\\":\\\"Kantor Cabang 1\\\",\\\"issuedAt\\\":\\\"2025-04-20T00:00:00.000Z\\\"}\",\n  \"type\": \"checkin\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/attendance",
+          "host": ["{{base_url}}"],
+          "path": ["attendance"]
+        }
+      }
+    },
+    {
+      "name": "Checkin Kantor Cabang 1 (Terlambat)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"qrValue\": \"{\\\"type\\\":\\\"attendance_qr\\\",\\\"companyId\\\":1,\\\"companyName\\\":\\\"PT.A\\\",\\\"zonaId\\\":1,\\\"zonaName\\\":\\\"Kantor Cabang 1\\\",\\\"issuedAt\\\":\\\"2025-04-20T00:00:00.000Z\\\"}\",\n  \"type\": \"checkin\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/attendance",
+          "host": ["{{base_url}}"],
+          "path": ["attendance"]
+        }
+      }
+    },
+    {
+      "name": "Checkout Kantor Cabang 1",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"qrValue\": \"{\\\"type\\\":\\\"attendance_qr\\\",\\\"companyId\\\":1,\\\"companyName\\\":\\\"PT.A\\\",\\\"zonaId\\\":1,\\\"zonaName\\\":\\\"Kantor Cabang 1\\\",\\\"issuedAt\\\":\\\"2025-04-20T00:00:00.000Z\\\"}\",\n  \"type\": \"checkout\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/attendance",
+          "host": ["{{base_url}}"],
+          "path": ["attendance"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" }
+  ]
+}

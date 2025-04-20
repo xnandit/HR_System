@@ -1,0 +1,49 @@
+{
+  "info": {
+    "_postman_id": "qr-collection-001",
+    "name": "Generate QR Code API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection untuk testing endpoint generate QR code company & zona"
+  },
+  "item": [
+    {
+      "name": "Get QR for Zona 1 (PT.A - Kantor Cabang 1)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/company/1/zona/1/qr",
+          "host": ["{{base_url}}"],
+          "path": ["company", "1", "zona", "1", "qr"]
+        }
+      }
+    },
+    {
+      "name": "Get QR for Zona 2 (PT.A - Kantor Cabang 2)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/company/1/zona/2/qr",
+          "host": ["{{base_url}}"],
+          "path": ["company", "1", "zona", "2", "qr"]
+        }
+      }
+    },
+    {
+      "name": "Get QR for Zona 3 (PT.B - Gudang Pusat)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/company/2/zona/3/qr",
+          "host": ["{{base_url}}"],
+          "path": ["company", "2", "zona", "3", "qr"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000" }
+  ]
+}
