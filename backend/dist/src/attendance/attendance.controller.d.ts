@@ -12,10 +12,10 @@ export declare class AttendanceController {
         };
     } & {
         id: number;
-        userId: number;
-        zonaId: number;
-        type: import(".prisma/client").$Enums.AttendanceType;
         createdAt: Date;
+        zonaId: number;
+        userId: number;
+        type: import(".prisma/client").$Enums.AttendanceType;
     }>;
     getAttendance(req: Request, date?: string): Promise<({
         zona: {
@@ -26,9 +26,9 @@ export declare class AttendanceController {
         };
     } & {
         id: number;
-        userId: number;
-        zonaId: number;
-        type: import(".prisma/client").$Enums.AttendanceType;
         createdAt: Date;
+        zonaId: number;
+        userId: number;
+        type: import(".prisma/client").$Enums.AttendanceType;
     })[]>;
 }

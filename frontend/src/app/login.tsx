@@ -7,12 +7,14 @@ export default function LoginPage({ onLogin }: { onLogin: (token: string) => voi
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("http://localhost:3000/user/login", {
+      const res = await fetch(`${apiUrl}/user/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })

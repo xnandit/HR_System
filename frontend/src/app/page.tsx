@@ -10,12 +10,14 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [absenType, setAbsenType] = useState<'checkin' | 'checkout'>('checkin');
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
   const handleScan = async (qr: string) => {
     setScanResult(qr);
     setAttendanceStatus(null);
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:3000/attendance", {
+      const res = await fetch(`${apiUrl}/attendance`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
