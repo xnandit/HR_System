@@ -31,11 +31,14 @@ export default function QrScanner({ onScan }: { onScan: (result: string) => void
           () => {}
         )
         .then(() => {})
-        .catch((err: any) => {
-          setError("Camera access error: " + err);
+        .catch((err: unknown) => {
+          if (typeof err === 'string') setError('Camera access error: ' + err);
+          else if (err instanceof Error) setError('Camera access error: ' + err.message);
+          else setError('Camera access error: Unknown error');
         });
-    } catch (e: any) {
-      setError("Failed to start QR scanner: " + e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) setError('Failed to start QR scanner: ' + e.message);
+      else setError('Failed to start QR scanner: Unknown error');
     }
     return () => {
       isMounted = false;

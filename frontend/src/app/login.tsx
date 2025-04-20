@@ -21,8 +21,9 @@ export default function LoginPage({ onLogin }: { onLogin: (token: string) => voi
       const data = await res.json();
       if (!data.access_token) throw new Error("Token tidak ditemukan");
       onLogin(data.access_token);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) setError(e.message);
+      else setError('Unknown error');
     } finally {
       setLoading(false);
     }

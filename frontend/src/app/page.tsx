@@ -28,8 +28,9 @@ export default function Home() {
         throw new Error(err.message || "Gagal absen");
       }
       setAttendanceStatus("Absen berhasil!");
-    } catch (e: any) {
-      setAttendanceStatus(e.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) setAttendanceStatus(e.message);
+      else setAttendanceStatus('Unknown error');
     } finally {
       setLoading(false);
     }
