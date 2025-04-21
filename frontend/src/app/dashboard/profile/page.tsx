@@ -19,7 +19,12 @@ export default function ProfilePage() {
       setLoading(true);
       try {
         const res = await fetch(`${apiUrl}/user/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "true"
+          },
         });
         if (!res.ok) throw new Error("Gagal mengambil data profil");
         const data = await res.json();
