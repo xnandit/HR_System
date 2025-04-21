@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 interface UserProfile {
   id: string;
@@ -37,7 +38,7 @@ export default function ProfilePage() {
     <div style={{ maxWidth: 440, margin: '0 auto', background: '#fff', borderRadius: 8, boxShadow: '0 1px 8px #e0e0e0', padding: 32 }}>
       <h2 style={{ textAlign: 'center', color: '#5fa98a', marginBottom: 16 }}>Profil Pengguna</h2>
       {loading ? (
-        <div style={{ textAlign: 'center' }}>Loading...</div>
+        <div style={{ textAlign: 'center' }}><Button variant="ghost" disabled>Loading...</Button></div>
       ) : !profile ? (
         <div style={{ textAlign: 'center', color: '#888' }}>Data profil tidak ditemukan.</div>
       ) : (

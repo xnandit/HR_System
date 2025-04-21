@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./login.module.css";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -43,7 +45,7 @@ export default function LoginPage() {
           <h2 className={styles.loginTitle}>CUSTOMER LOGIN</h2>
           <div className={styles.inputGroup}>
             <span className={styles.iconUser} />
-            <input
+            <Input
               type="email"
               placeholder="Username"
               value={email}
@@ -55,7 +57,7 @@ export default function LoginPage() {
           </div>
           <div className={styles.inputGroup}>
             <span className={styles.iconLock} />
-            <input
+            <Input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
@@ -64,24 +66,22 @@ export default function LoginPage() {
               className={styles.loginInput}
               autoComplete="current-password"
             />
-            <button
-              type="button"
-              className={styles.showPasswordBtn}
-              onClick={() => setShowPassword(s => !s)}
-              tabIndex={-1}
-              aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
-            >
-              {showPassword ? (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8db7a5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-5 0-9.27-3.11-11-8 1.09-2.86 3.05-5.17 5.62-6.44"/><path d="M1 1l22 22"/><path d="M9.53 9.53A3 3 0 0 0 12 15a3 3 0 0 0 2.47-5.47"/><path d="M14.47 14.47A3 3 0 0 1 12 9a3 3 0 0 1-2.47 5.47"/></svg>
-              ) : (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8db7a5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="12" rx="10" ry="7"/><circle cx="12" cy="12" r="3"/></svg>
-              )}
-            </button>
           </div>
-          <button type="submit" className={styles.loginBtn} disabled={loading}>
-            {loading ? "Loading..." : "LOGIN"}
-          </button>
-          {error && <div className={styles.loginError}>{error}</div>}
+          <div className={styles.inputGroup}>
+            <label style={{ fontSize: 14, color: '#666', display: 'flex', alignItems: 'center' }}>
+              <input
+                type="checkbox"
+                checked={showPassword}
+                onChange={() => setShowPassword(!showPassword)}
+                style={{ marginRight: 6 }}
+              />
+              Tampilkan Password
+            </label>
+          </div>
+          {error && <div style={{ color: '#e74c3c', marginBottom: 8, textAlign: 'center' }}>{error}</div>}
+          <Button type="submit" className={styles.loginBtn} disabled={loading} style={{ marginTop: 12, width: '100%' }}>
+            {loading ? "Loading..." : "Login"}
+          </Button>
         </form>
       </div>
     </div>

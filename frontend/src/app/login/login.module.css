@@ -50,12 +50,10 @@
   position: relative;
 }
 .iconUser::before {
-  content: "\\01F464";
   margin-right: 0.4rem;
   font-size: 1.1rem;
 }
 .iconLock::before {
-  content: "\\01F512";
   margin-right: 0.4rem;
   font-size: 1.1rem;
 }

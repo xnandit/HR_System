@@ -4,18 +4,15 @@ export declare class AttendanceController {
     private attendanceService;
     constructor(attendanceService: AttendanceService);
     createAttendance(req: Request, qrValue: string, type: 'checkin' | 'checkout'): Promise<{
-        zona: {
-            name: string;
-            company: {
-                name: string;
-            };
-        };
-    } & {
         id: number;
         createdAt: Date;
+        updatedAt: Date;
         zonaId: number;
         userId: number;
-        type: import(".prisma/client").$Enums.AttendanceType;
+        date: Date;
+        checkIn: Date | null;
+        checkOut: Date | null;
+        status: string | null;
     }>;
     getAttendance(req: Request, date?: string): Promise<({
         zona: {
@@ -27,8 +24,12 @@ export declare class AttendanceController {
     } & {
         id: number;
         createdAt: Date;
+        updatedAt: Date;
         zonaId: number;
         userId: number;
-        type: import(".prisma/client").$Enums.AttendanceType;
+        date: Date;
+        checkIn: Date | null;
+        checkOut: Date | null;
+        status: string | null;
     })[]>;
 }

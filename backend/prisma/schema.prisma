@@ -28,13 +28,17 @@ model User {
 }
 
 model Attendance {
-  id         Int            @id @default(autoincrement())
-  user      User           @relation(fields: [userId], references: [id])
-  userId    Int
-  zona      Zona           @relation(fields: [zonaId], references: [id])
-  zonaId    Int
-  type      AttendanceType
-  createdAt DateTime       @default(now())
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  zonaId     Int
+  date       DateTime // hanya tanggal (tanpa jam, gunakan 00:00:00)
+  checkIn    DateTime?
+  checkOut   DateTime?
+  status     String?   // on-time | late
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id])
+  zona       Zona     @relation(fields: [zonaId], references: [id])
 }
 
 model Company {

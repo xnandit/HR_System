@@ -42,53 +42,78 @@ let AttendanceService = class AttendanceService {
         function localToUtc(date) {
             return (0, date_fns_tz_1.fromZonedTime)(date, timeZone);
         }
-        const start = localToUtc(new Date(todayZoned.getFullYear(), todayZoned.getMonth(), todayZoned.getDate(), 0, 0, 0, 0));
-        const end = localToUtc(new Date(todayZoned.getFullYear(), todayZoned.getMonth(), todayZoned.getDate(), 23, 59, 59, 999));
+        const dateOnly = localToUtc(new Date(todayZoned.getFullYear(), todayZoned.getMonth(), todayZoned.getDate(), 0, 0, 0, 0));
         const zonedNow = (0, date_fns_tz_1.fromZonedTime)(todayZoned, timeZone);
-        const existing = await this.prisma.attendance.findFirst({
+        let attendance = await this.prisma.attendance.findFirst({
             where: {
                 userId,
                 zonaId: zona.id,
-                type,
-                createdAt: { gte: start, lte: end },
+                date: dateOnly,
             },
         });
-        if (existing) {
-            throw new common_1.ForbiddenException(`Sudah melakukan ${type} hari ini di zona ini`);
-        }
-        let attendanceType = type;
         if (type === 'checkin') {
-            const schedule = zona.schedules[0];
-            if (schedule) {
-                const [h, m] = schedule.checkinTime.split(':').map(Number);
-                const checkinTime = new Date(todayZoned.getFullYear(), todayZoned.getMonth(), todayZoned.getDate(), h, m, 0, 0);
-                const toleranceMs = schedule.toleranceMin * 60 * 1000;
-                if (now.getTime() > checkinTime.getTime() + toleranceMs) {
-                    attendanceType = 'late';
+            if (attendance && attendance.checkIn) {
+                throw new common_1.ForbiddenException('Sudah melakukan checkin hari ini di zona ini');
+            }
+            let status = undefined;
+            if (zona.schedules && zona.schedules.length > 0 && zona.schedules[0].checkinTime) {
+                const schedule = zona.schedules[0];
+                const [jamMasuk, menitMasuk] = schedule.checkinTime.split(":").map(Number);
+                const toleransi = Number(schedule.toleranceMin || 0);
+                const jadwalMasukDate = new Date(todayZoned);
+                jadwalMasukDate.setHours(jamMasuk, menitMasuk + toleransi, 0, 0);
+                if (todayZoned > jadwalMasukDate) {
+                    status = 'late';
+                }
+                else {
+                    status = 'on-time';
                 }
             }
+            if (!attendance) {
+                attendance = await this.prisma.attendance.create({
+                    data: {
+                        userId,
+                        zonaId: zona.id,
+                        date: dateOnly,
+                        checkIn: zonedNow,
+                        status,
+                    },
+                    include: { zona: { select: { name: true, company: { select: { name: true } } } } },
+                });
+            }
+            else {
+                attendance = await this.prisma.attendance.update({
+                    where: { id: attendance.id },
+                    data: { checkIn: zonedNow, status },
+                    include: { zona: { select: { name: true, company: { select: { name: true } } } } },
+                });
+            }
+            return attendance;
         }
-        return this.prisma.attendance.create({
-            data: {
-                userId,
-                zonaId: zona.id,
-                type: attendanceType,
-                createdAt: zonedNow,
-            },
-            include: { zona: { select: { name: true, company: { select: { name: true } } } } },
-        });
+        else if (type === 'checkout') {
+            if (!attendance || !attendance.checkIn) {
+                throw new common_1.ForbiddenException('Belum melakukan checkin hari ini di zona ini');
+            }
+            if (attendance.checkOut) {
+                throw new common_1.ForbiddenException('Sudah melakukan checkout hari ini di zona ini');
+            }
+            attendance = await this.prisma.attendance.update({
+                where: { id: attendance.id },
+                data: { checkOut: zonedNow },
+                include: { zona: { select: { name: true, company: { select: { name: true } } } } },
+            });
+            return attendance;
+        }
+        throw new common_1.BadRequestException('Invalid attendance type');
     }
     async getAttendanceByUser(userId, date) {
         const where = { userId };
         if (date) {
-            where.createdAt = {
-                gte: new Date(date.setHours(0, 0, 0, 0)),
-                lt: new Date(date.setHours(23, 59, 59, 999)),
-            };
+            where.date = date;
         }
         return this.prisma.attendance.findMany({
             where,
-            orderBy: { createdAt: 'desc' },
+            orderBy: { date: 'desc' },
             include: { zona: { select: { name: true, company: { select: { name: true } } } } },
         });
     }

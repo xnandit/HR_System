@@ -2,17 +2,17 @@
 
 ## 1. Status Kehadiran
 - **Hadir**: User melakukan check-in pada hari tersebut.
-  - **Tepat waktu**: Check-in dilakukan sebelum atau sama dengan waktu jadwal masuk + toleransi.
-  - **Telat**: Check-in dilakukan setelah waktu jadwal masuk + toleransi.
+  - **Tepat waktu**: Check-in dilakukan sebelum atau sama dengan waktu jadwal masuk + toleransi + sudah check-out.
+  - **Telat**: Check-in dilakukan setelah waktu jadwal masuk + toleransi + sudah check-out.
   - **Belum Checkout**: User sudah check-in tetapi belum melakukan checkout (data checkout kosong).
 - **Absent**: User tidak melakukan check-in pada hari tersebut (tidak ada data kehadiran).
 
 ## 2. Kolom Riwayat Kehadiran
 - **Tanggal**: Tanggal saja
-- **Checkin**: Jam Checkin
-- **Checkout**: Jam Checkout, kalau belum ada "-"
+- **Check-in**: Jam Check-in
+- **Check-out**: Jam Check-out, kalau belum ada "-"
 - **Status**: "Hadir" jika sudah check-in, "Absent" jika tidak ada check-in
-- **Keterangan**: "Tepat waktu"/"Telat"/"Belum Checkout"/"Tidak Checkin"
+- **Keterangan**: "Tepat waktu"/"Telat"/"Belum Checkout"/"Tidak Check-in"
 - **Zona**: Nama zona kehadiran
 - **Perusahaan**: Nama perusahaan
 
