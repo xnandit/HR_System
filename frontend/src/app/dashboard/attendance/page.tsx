@@ -67,7 +67,6 @@ export default function AttendancePage() {
       <QrScanner
         onScan={handleScan}
         enabled={scannerEnabled}
-        style={{ margin: '0 auto', display: 'block', width: 260, height: 260 }}
       />
       {scanResult && (
         <div style={{ marginTop: 12, textAlign: 'center', color: '#888' }}>

@@ -48,7 +48,7 @@ export default function Home() {
   };
 
   if (!token) {
-    return <LoginPage onLogin={setToken} />;
+    return <LoginPage />;
   }
 
   return (
