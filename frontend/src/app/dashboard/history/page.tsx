@@ -21,12 +21,7 @@ export default function HistoryPage() {
       setLoading(true);
       try {
         const res = await fetch(`${apiUrl}/attendance`, {
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": "true"
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Gagal mengambil data riwayat");
         const data = await res.json();
