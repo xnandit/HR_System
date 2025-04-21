@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 
 @Injectable()
 export class AttendanceService {
@@ -27,9 +28,18 @@ export class AttendanceService {
     }
 
     // 3. Cek apakah user sudah absen hari ini di zona ini (type yang sama)
-    const today = new Date();
-    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
-    const end = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+    // Gunakan waktu lokal zona
+    const timeZone = zona.timeZone || 'Asia/Jakarta';
+    const now = new Date();
+    // Konversi UTC ke waktu lokal zona
+    const todayZoned = toZonedTime(now, timeZone);
+    // Konversi waktu lokal zona ke UTC
+    function localToUtc(date: Date) {
+      return fromZonedTime(date, timeZone);
+    }
+    const start = localToUtc(new Date(todayZoned.getFullYear(), todayZoned.getMonth(), todayZoned.getDate(), 0, 0, 0, 0));
+    const end = localToUtc(new Date(todayZoned.getFullYear(), todayZoned.getMonth(), todayZoned.getDate(), 23, 59, 59, 999));
+    const zonedNow = fromZonedTime(todayZoned, timeZone);
     const existing = await this.prisma.attendance.findFirst({
       where: {
         userId,
@@ -49,20 +59,21 @@ export class AttendanceService {
       if (schedule) {
         // Parse schedule.checkinTime (HH:mm)
         const [h, m] = schedule.checkinTime.split(':').map(Number);
-        const checkinTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), h, m, 0, 0);
+        const checkinTime = new Date(todayZoned.getFullYear(), todayZoned.getMonth(), todayZoned.getDate(), h, m, 0, 0);
         const toleranceMs = schedule.toleranceMin * 60 * 1000;
-        if (today.getTime() > checkinTime.getTime() + toleranceMs) {
+        if (now.getTime() > checkinTime.getTime() + toleranceMs) {
           attendanceType = 'late';
         }
       }
     }
 
-    // 5. Simpan attendance
+    // 5. Simpan attendance dengan waktu sesuai zona
     return this.prisma.attendance.create({
       data: {
         userId,
         zonaId: zona.id,
         type: attendanceType,
+        createdAt: zonedNow,
       },
       include: { zona: { select: { name: true, company: { select: { name: true } } } } },
     });

@@ -1,7 +1,7 @@
 "use client";
 import QrScanner from "../components/QrScanner";
 import { useState } from "react";
-import LoginPage from "./login";
+import LoginPage from "./login/page";
 
 export default function Home() {
   const [token, setToken] = useState<string | null>(null);
@@ -9,13 +9,17 @@ export default function Home() {
   const [attendanceStatus, setAttendanceStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [absenType, setAbsenType] = useState<'checkin' | 'checkout'>('checkin');
+  const [scannerEnabled, setScannerEnabled] = useState(true);
+  const [checkoutEnabled, setCheckoutEnabled] = useState(false);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
   const handleScan = async (qr: string) => {
+    if (!scannerEnabled) return;
     setScanResult(qr);
     setAttendanceStatus(null);
     setLoading(true);
+    setScannerEnabled(false);
     try {
       const res = await fetch(`${apiUrl}/attendance`, {
         method: "POST",
@@ -30,6 +34,11 @@ export default function Home() {
         throw new Error(err.message || "Gagal absen");
       }
       setAttendanceStatus("Absen berhasil!");
+      if (absenType === 'checkin') {
+        setCheckoutEnabled(true);
+      } else {
+        setCheckoutEnabled(false);
+      }
     } catch (e: unknown) {
       if (e instanceof Error) setAttendanceStatus(e.message);
       else setAttendanceStatus('Unknown error');
@@ -49,18 +58,20 @@ export default function Home() {
         Silakan scan QR code yang tersedia di kantor untuk mencatat kehadiran Anda.
       </p>
       <div className="w-full max-w-xs bg-white rounded-lg shadow p-4 flex flex-col items-center">
-        <QrScanner onScan={handleScan} />
+        <QrScanner onScan={handleScan} enabled={scannerEnabled} />
       </div>
       <div className="flex gap-4 mt-4">
         <button
           className={`px-4 py-2 rounded font-bold border ${absenType === 'checkin' ? 'bg-blue-700 text-white' : 'bg-white text-blue-700 border-blue-700'}`}
-          onClick={() => setAbsenType('checkin')}
+          onClick={() => { setAbsenType('checkin'); setScannerEnabled(true); setAttendanceStatus(null); }}
+          disabled={loading || checkoutEnabled}
         >
           Check In
         </button>
         <button
           className={`px-4 py-2 rounded font-bold border ${absenType === 'checkout' ? 'bg-blue-700 text-white' : 'bg-white text-blue-700 border-blue-700'}`}
-          onClick={() => setAbsenType('checkout')}
+          onClick={() => { setAbsenType('checkout'); setScannerEnabled(true); setAttendanceStatus(null); }}
+          disabled={loading || !checkoutEnabled}
         >
           Check Out
         </button>

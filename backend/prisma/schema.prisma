@@ -50,6 +50,7 @@ model Zona {
   companyId  Int
   attendances Attendance[]
   schedules  ZonaSchedule[]
+  timeZone   String   @default("Asia/Jakarta") // ex: "Asia/Jakarta", "Asia/Makassar", "Asia/Jayapura"
 }
 
 model ZonaSchedule {

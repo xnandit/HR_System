@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttendanceService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma.service");
+const date_fns_tz_1 = require("date-fns-tz");
 let AttendanceService = class AttendanceService {
     prisma;
     constructor(prisma) {
@@ -35,9 +36,15 @@ let AttendanceService = class AttendanceService {
         if (!zona || zona.company.id !== qrPayload.companyId) {
             throw new common_1.NotFoundException('Zona or company not found/invalid');
         }
-        const today = new Date();
-        const start = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
-        const end = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+        const timeZone = zona.timeZone || 'Asia/Jakarta';
+        const now = new Date();
+        const todayZoned = (0, date_fns_tz_1.toZonedTime)(now, timeZone);
+        function localToUtc(date) {
+            return (0, date_fns_tz_1.fromZonedTime)(date, timeZone);
+        }
+        const start = localToUtc(new Date(todayZoned.getFullYear(), todayZoned.getMonth(), todayZoned.getDate(), 0, 0, 0, 0));
+        const end = localToUtc(new Date(todayZoned.getFullYear(), todayZoned.getMonth(), todayZoned.getDate(), 23, 59, 59, 999));
+        const zonedNow = (0, date_fns_tz_1.fromZonedTime)(todayZoned, timeZone);
         const existing = await this.prisma.attendance.findFirst({
             where: {
                 userId,
@@ -54,9 +61,9 @@ let AttendanceService = class AttendanceService {
             const schedule = zona.schedules[0];
             if (schedule) {
                 const [h, m] = schedule.checkinTime.split(':').map(Number);
-                const checkinTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), h, m, 0, 0);
+                const checkinTime = new Date(todayZoned.getFullYear(), todayZoned.getMonth(), todayZoned.getDate(), h, m, 0, 0);
                 const toleranceMs = schedule.toleranceMin * 60 * 1000;
-                if (today.getTime() > checkinTime.getTime() + toleranceMs) {
+                if (now.getTime() > checkinTime.getTime() + toleranceMs) {
                     attendanceType = 'late';
                 }
             }
@@ -66,6 +73,7 @@ let AttendanceService = class AttendanceService {
                 userId,
                 zonaId: zona.id,
                 type: attendanceType,
+                createdAt: zonedNow,
             },
             include: { zona: { select: { name: true, company: { select: { name: true } } } } },
         });

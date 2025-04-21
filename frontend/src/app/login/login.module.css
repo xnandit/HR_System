@@ -1,0 +1,106 @@
+/* Login page styles, extracted from login.tsx */
+.bgMintGreen {
+  background: #9ad8c3;
+}
+.diamondBg {
+  position: relative;
+  width: 420px;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.diamondBg::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.3);
+  transform: rotate(45deg);
+  left: 0; top: 0;
+  border-radius: 12px;
+}
+.loginBox {
+  position: relative;
+  z-index: 2;
+  width: 340px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 6px 32px 0 rgba(0,0,0,0.09);
+  padding: 2.5rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: stretch;
+}
+.loginTitle {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: #6e9786;
+  margin-bottom: 0.5rem;
+}
+.inputGroup {
+  display: flex;
+  align-items: center;
+  background: #f5f8f7;
+  border-radius: 4px;
+  padding: 0.4rem 0.5rem;
+  position: relative;
+}
+.iconUser::before {
+  content: "\\01F464";
+  margin-right: 0.4rem;
+  font-size: 1.1rem;
+}
+.iconLock::before {
+  content: "\\01F512";
+  margin-right: 0.4rem;
+  font-size: 1.1rem;
+}
+.loginInput {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  flex: 1;
+  color: #3a4a42;
+  padding: 0.3rem 0;
+  text-align: left;
+}
+.showPasswordBtn {
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin-left: 0.1rem;
+  color: #8db7a5;
+  display: flex;
+  align-items: center;
+}
+.showPasswordBtn svg {
+  display: block;
+}
+.loginBtn {
+  background: #5fa98a;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  font-size: 1.08rem;
+  font-weight: 500;
+  padding: 0.7rem 0;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.loginBtn:disabled {
+  background: #b4cfc2;
+  cursor: not-allowed;
+}
+.loginError {
+  color: #e74c3c;
+  text-align: center;
+  font-size: 0.95rem;
+}

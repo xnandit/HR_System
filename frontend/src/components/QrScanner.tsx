@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 
-export default function QrScanner({ onScan }: { onScan: (result: string) => void }) {
+export default function QrScanner({ onScan, enabled = true }: { onScan: (result: string) => void; enabled?: boolean }) {
   const scannerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
@@ -16,6 +16,14 @@ export default function QrScanner({ onScan }: { onScan: (result: string) => void
     if (!isLoaded) return;
     let isMounted = true;
     if (!scannerRef.current) return;
+    if (!enabled) {
+      if (html5QrCodeRef.current) {
+        html5QrCodeRef.current.stop().then(() => {
+          html5QrCodeRef.current?.clear();
+        });
+      }
+      return;
+    }
     try {
       html5QrCodeRef.current = new Html5Qrcode(scannerRef.current.id);
       html5QrCodeRef.current
@@ -26,7 +34,7 @@ export default function QrScanner({ onScan }: { onScan: (result: string) => void
             qrbox: { width: 250, height: 250 },
           },
           (decodedText: string) => {
-            if (isMounted) onScan(decodedText);
+            if (isMounted && enabled) onScan(decodedText);
           },
           () => {}
         )
@@ -49,13 +57,14 @@ export default function QrScanner({ onScan }: { onScan: (result: string) => void
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded]);
+  }, [isLoaded, enabled]);
 
   return (
     <div>
-      <div id="qr-scanner" ref={scannerRef} style={{ width: 260, height: 260, margin: "0 auto" }} />
+      <div id="qr-scanner" ref={scannerRef} style={{ width: 260, height: 260, margin: "0 auto", opacity: enabled ? 1 : 0.5, pointerEvents: enabled ? 'auto' : 'none' }} />
       {error && <div style={{ color: "red" }}>{error}</div>}
       {!isLoaded && !error && <div className="text-gray-500">Memuat scanner...</div>}
+      {!enabled && <div className="text-gray-500 text-center mt-2">Scanner nonaktif, silakan lanjutkan proses absen.</div>}
     </div>
   );
 }

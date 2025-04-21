@@ -45,24 +45,33 @@ async function main() {
         update: {},
         create: { name: 'PT.B' },
     });
-    await prisma.zona.upsert({
+    const zona1 = await prisma.zona.upsert({
         where: { name: 'Kantor Cabang 1' },
         update: {},
-        create: { name: 'Kantor Cabang 1', companyId: companyA.id },
+        create: {
+            name: 'Kantor Cabang 1',
+            companyId: companyA.id,
+            timeZone: 'Asia/Jakarta',
+        },
     });
-    await prisma.zona.upsert({
+    const zona2 = await prisma.zona.upsert({
         where: { name: 'Kantor Cabang 2' },
         update: {},
-        create: { name: 'Kantor Cabang 2', companyId: companyA.id },
+        create: {
+            name: 'Kantor Cabang 2',
+            companyId: companyA.id,
+            timeZone: 'Asia/Makassar',
+        },
     });
-    await prisma.zona.upsert({
+    const zona3 = await prisma.zona.upsert({
         where: { name: 'Gudang Pusat' },
         update: {},
-        create: { name: 'Gudang Pusat', companyId: companyB.id },
+        create: {
+            name: 'Gudang Pusat',
+            companyId: companyB.id,
+            timeZone: 'Asia/Jayapura',
+        },
     });
-    const zona1 = await prisma.zona.findUnique({ where: { name: 'Kantor Cabang 1' } });
-    const zona2 = await prisma.zona.findUnique({ where: { name: 'Kantor Cabang 2' } });
-    const zona3 = await prisma.zona.findUnique({ where: { name: 'Gudang Pusat' } });
     if (zona1) {
         await prisma.zonaSchedule.upsert({
             where: { zonaId: zona1.id },
