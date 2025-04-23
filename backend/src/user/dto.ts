@@ -3,6 +3,7 @@ export class RegisterDto {
   password: string;
   name: string;
   role?: string; // employee | admin
+  companyId: number;
 }
 
 export class LoginDto {

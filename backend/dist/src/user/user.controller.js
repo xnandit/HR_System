@@ -34,6 +34,12 @@ let UserController = class UserController {
     async getProfile(req) {
         return this.userService.getProfile(req.user.sub);
     }
+    async getCompanyUsers(req) {
+        return this.userService.getCompanyUsers(req.user);
+    }
+    async searchUser(req, name) {
+        return this.userService.searchUser(req.user, name);
+    }
 };
 exports.UserController = UserController;
 __decorate([
@@ -58,6 +64,23 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('company'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getCompanyUsers", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)('search'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)('name')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "searchUser", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
     __metadata("design:paramtypes", [user_service_1.UserService, jwt_1.JwtService])

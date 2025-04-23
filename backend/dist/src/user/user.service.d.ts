@@ -26,4 +26,16 @@ export declare class UserService {
         name: string;
         role: string;
     }>;
+    getCompanyUsers(user: any): Promise<{
+        id: number;
+        email: string;
+        name: string;
+        role: string;
+    }[]>;
+    searchUser(user: any, name: string): Promise<{
+        id: number;
+        email: string;
+        name: string;
+        role: string;
+    }[]>;
 }

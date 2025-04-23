@@ -6,6 +6,7 @@ class RegisterDto {
     password;
     name;
     role;
+    companyId;
 }
 exports.RegisterDto = RegisterDto;
 class LoginDto {

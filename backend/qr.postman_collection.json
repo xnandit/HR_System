@@ -3,7 +3,7 @@
     "_postman_id": "qr-collection-001",
     "name": "Generate QR Code API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Collection untuk testing endpoint generate QR code company & zona"
+    "description": "Collection untuk testing endpoint generate QR code company & zona. Tambahan: endpoint user company dan search jika diperlukan untuk frontend QR."
   },
   "item": [
     {
@@ -41,9 +41,41 @@
           "path": ["company", "2", "zona", "3", "qr"]
         }
       }
+    },
+    {
+      "name": "Get Company Users (Admin Only)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/user/company",
+          "host": ["{{base_url}}"],
+          "path": ["user", "company"]
+        }
+      }
+    },
+    {
+      "name": "Search User by Name (Admin)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/user/search?name=andi",
+          "host": ["{{base_url}}"],
+          "path": ["user", "search"],
+          "query": [
+            { "key": "name", "value": "andi" }
+          ]
+        }
+      }
     }
   ],
   "variable": [
-    { "key": "base_url", "value": "http://localhost:3000" }
+    { "key": "base_url", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" }
   ]
 }

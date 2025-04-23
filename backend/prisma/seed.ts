@@ -8,45 +8,6 @@ async function main() {
     const password = await bcrypt.hash('password123', 10);
     console.log('Seeding users...');
 
-    // Staff 1
-    await prisma.user.upsert({
-      where: { email: 'staff1@example.com' },
-      update: {},
-      create: {
-        email: 'staff1@example.com',
-        name: 'Staff Satu',
-        password,
-        role: 'employee',
-      },
-    });
-    console.log('Staff 1 seeded');
-
-    // Staff 2
-    await prisma.user.upsert({
-      where: { email: 'staff2@example.com' },
-      update: {},
-      create: {
-        email: 'staff2@example.com',
-        name: 'Staff Dua',
-        password,
-        role: 'employee',
-      },
-    });
-    console.log('Staff 2 seeded');
-
-    // HRD/Supervisor
-    await prisma.user.upsert({
-      where: { email: 'hrd@example.com' },
-      update: {},
-      create: {
-        email: 'hrd@example.com',
-        name: 'HRD Supervisor',
-        password,
-        role: 'admin',
-      },
-    });
-    console.log('HRD seeded');
-
     // Company & Zona Example Data
     console.log('Seeding companies and zonas...');
     const companyA = await prisma.company.upsert({
@@ -61,6 +22,48 @@ async function main() {
       create: { name: 'PT.B' },
     });
     console.log('Company PT.B seeded');
+
+    // Staff 1
+    await prisma.user.upsert({
+      where: { email: 'staff1@example.com' },
+      update: {},
+      create: {
+        email: 'staff1@example.com',
+        name: 'Staff Satu',
+        password,
+        role: 'employee',
+        companyId: companyA.id,
+      },
+    });
+    console.log('Staff 1 seeded');
+
+    // Staff 2
+    await prisma.user.upsert({
+      where: { email: 'staff2@example.com' },
+      update: {},
+      create: {
+        email: 'staff2@example.com',
+        name: 'Staff Dua',
+        password,
+        role: 'employee',
+        companyId: companyA.id,
+      },
+    });
+    console.log('Staff 2 seeded');
+
+    // HRD/Supervisor
+    await prisma.user.upsert({
+      where: { email: 'hrd@example.com' },
+      update: {},
+      create: {
+        email: 'hrd@example.com',
+        name: 'HRD Supervisor',
+        password,
+        role: 'admin',
+        companyId: companyA.id,
+      },
+    });
+    console.log('HRD seeded');
 
     // Zona 1: Kantor Cabang 1 (Jakarta)
     const zona1 = await prisma.zona.upsert({

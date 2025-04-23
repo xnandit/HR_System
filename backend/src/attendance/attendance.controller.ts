@@ -24,4 +24,26 @@ export class AttendanceController {
     const userId = req.user.sub;
     return this.attendanceService.getAttendanceByUser(userId, date ? new Date(date) : undefined);
   }
+
+  @Get('summary')
+  async getSummary(
+    @Req() req: Request,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('userId') userId?: string
+  ) {
+    // @ts-ignore
+    return this.attendanceService.getSummary(req.user, startDate, endDate, userId);
+  }
+
+  @Get('employee-history')
+  async getEmployeeHistory(
+    @Req() req: Request,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('userId') userId?: string
+  ) {
+    // @ts-ignore
+    return this.attendanceService.getEmployeeHistory(req.user, startDate, endDate, userId);
+  }
 }

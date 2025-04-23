@@ -18,6 +18,7 @@ export class UserService {
         password: hash,
         name: dto.name,
         role: dto.role || 'employee',
+        companyId: dto.companyId,
       },
     });
     return { id: user.id, email: user.email, name: user.name, role: user.role };
@@ -40,5 +41,23 @@ export class UserService {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new UnauthorizedException('User not found');
     return { id: user.id, email: user.email, name: user.name, role: user.role };
+  }
+
+  async getCompanyUsers(user: any) {
+    if (user.role !== 'admin') throw new Error('Only admin');
+    return this.prisma.user.findMany({
+      where: { companyId: user.companyId },
+      select: { id: true, name: true, email: true, role: true }
+    });
+  }
+
+  async searchUser(user: any, name: string) {
+    return this.prisma.user.findMany({
+      where: {
+        companyId: user.companyId,
+        name: { contains: name, mode: 'insensitive' }
+      },
+      select: { id: true, name: true, email: true, role: true }
+    });
   }
 }

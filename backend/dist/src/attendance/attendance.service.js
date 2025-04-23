@@ -13,6 +13,7 @@ exports.AttendanceService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma.service");
 const date_fns_tz_1 = require("date-fns-tz");
+const workhour_1 = require("../utils/workhour");
 let AttendanceService = class AttendanceService {
     prisma;
     constructor(prisma) {
@@ -109,12 +110,117 @@ let AttendanceService = class AttendanceService {
     async getAttendanceByUser(userId, date) {
         const where = { userId };
         if (date) {
-            where.date = date;
+            const start = new Date(date);
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(date);
+            end.setHours(23, 59, 59, 999);
+            where.date = { gte: start, lte: end };
         }
-        return this.prisma.attendance.findMany({
+        const attendances = await this.prisma.attendance.findMany({
             where,
             orderBy: { date: 'desc' },
             include: { zona: { select: { name: true, company: { select: { name: true } } } } },
+        });
+        return attendances.map(att => {
+            let workHour = null;
+            if (att.checkIn && att.checkOut) {
+                workHour = (0, workhour_1.calculateWorkHour)(att.checkIn, att.checkOut);
+            }
+            return {
+                ...att,
+                type: att.checkOut ? 'checkout' : (att.status === 'late' ? 'late' : 'checkin'),
+                workHour,
+            };
+        });
+    }
+    async getSummary(user, startDate, endDate, userId) {
+        const where = {};
+        if (startDate && endDate) {
+            let zonaSchedules = [];
+            if (user.role === 'admin') {
+                zonaSchedules = await this.prisma.zonaSchedule.findMany({
+                    where: { zona: { companyId: user.companyId } },
+                    select: { timezone: true, zonaId: true }
+                });
+            }
+            else {
+                zonaSchedules = await this.prisma.zonaSchedule.findMany({
+                    where: { zona: { attendances: { some: { userId: user.id } } } },
+                    select: { timezone: true, zonaId: true }
+                });
+            }
+            const dateFilters = zonaSchedules.map(zs => {
+                const offset = zs.timezone ?? 7;
+                const start = new Date(`${startDate}T00:00:00+${offset.toString().padStart(2, '0')}:00`);
+                const end = new Date(`${endDate}T23:59:59.999+${offset.toString().padStart(2, '0')}:00`);
+                return { zonaId: zs.zonaId, date: { gte: start, lte: end } };
+            });
+            if (dateFilters.length > 0) {
+                where.OR = dateFilters;
+            }
+        }
+        if (user.role === 'admin') {
+            where.companyId = user.companyId;
+            if (userId)
+                where.userId = Number(userId);
+        }
+        else {
+            where.userId = user.id;
+        }
+        const [onTime, late] = await Promise.all([
+            this.prisma.attendance.count({ where: { ...where, status: 'on-time' } }),
+            this.prisma.attendance.count({ where: { ...where, status: 'late' } })
+        ]);
+        return { onTime, late, absent: 0 };
+    }
+    async getEmployeeHistory(user, startDate, endDate, userId) {
+        const where = {};
+        if (startDate && endDate) {
+            let zonaSchedules = [];
+            if (user.role === 'admin') {
+                zonaSchedules = await this.prisma.zonaSchedule.findMany({
+                    where: { zona: { companyId: user.companyId } },
+                    select: { timezone: true, zonaId: true }
+                });
+            }
+            else {
+                zonaSchedules = await this.prisma.zonaSchedule.findMany({
+                    where: { zona: { attendances: { some: { userId: user.id } } } },
+                    select: { timezone: true, zonaId: true }
+                });
+            }
+            const dateFilters = zonaSchedules.map(zs => {
+                const offset = zs.timezone ?? 7;
+                const start = new Date(`${startDate}T00:00:00+${offset.toString().padStart(2, '0')}:00`);
+                const end = new Date(`${endDate}T23:59:59.999+${offset.toString().padStart(2, '0')}:00`);
+                return { zonaId: zs.zonaId, date: { gte: start, lte: end } };
+            });
+            if (dateFilters.length > 0) {
+                where.OR = dateFilters;
+            }
+        }
+        if (user.role === 'admin') {
+            where.companyId = user.companyId;
+            if (userId)
+                where.userId = Number(userId);
+        }
+        else {
+            where.userId = user.id;
+        }
+        const attendances = await this.prisma.attendance.findMany({
+            where,
+            include: { user: { select: { name: true, email: true, role: true } }, zona: { select: { id: true, name: true, companyId: true, schedules: true } } },
+            orderBy: { date: 'desc' }
+        });
+        return attendances.map((att) => {
+            let workHour = null;
+            if (att.checkIn && att.checkOut) {
+                workHour = (0, workhour_1.calculateWorkHour)(att.checkIn, att.checkOut);
+            }
+            return {
+                ...att,
+                workHour,
+            };
         });
     }
 };

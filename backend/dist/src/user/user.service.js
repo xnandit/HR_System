@@ -32,6 +32,7 @@ let UserService = class UserService {
                 password: hash,
                 name: dto.name,
                 role: dto.role || 'employee',
+                companyId: dto.companyId,
             },
         });
         return { id: user.id, email: user.email, name: user.name, role: user.role };
@@ -55,6 +56,23 @@ let UserService = class UserService {
         if (!user)
             throw new common_1.UnauthorizedException('User not found');
         return { id: user.id, email: user.email, name: user.name, role: user.role };
+    }
+    async getCompanyUsers(user) {
+        if (user.role !== 'admin')
+            throw new Error('Only admin');
+        return this.prisma.user.findMany({
+            where: { companyId: user.companyId },
+            select: { id: true, name: true, email: true, role: true }
+        });
+    }
+    async searchUser(user, name) {
+        return this.prisma.user.findMany({
+            where: {
+                companyId: user.companyId,
+                name: { contains: name, mode: 'insensitive' }
+            },
+            select: { id: true, name: true, email: true, role: true }
+        });
     }
 };
 exports.UserService = UserService;

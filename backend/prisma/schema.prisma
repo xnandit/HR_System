@@ -22,6 +22,8 @@ model User {
   password  String
   name      String
   role      String   @default("employee") // employee | admin
+  companyId Int
+  company   Company  @relation(fields: [companyId], references: [id])
   attendances Attendance[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -45,6 +47,7 @@ model Company {
   id      Int     @id @default(autoincrement())
   name    String  @unique
   zonas   Zona[]
+  users   User[]
 }
 
 model Zona {
@@ -64,4 +67,5 @@ model ZonaSchedule {
   checkinTime     String // format: 'HH:mm'
   checkoutTime    String // format: 'HH:mm'
   toleranceMin    Int    // toleransi keterlambatan (menit)
+  timezone        Int    @default(7) // offset jam timezone, default 7 (WIB), bisa 8 (WITA), 9 (WIT)
 }

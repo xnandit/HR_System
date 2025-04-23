@@ -7,39 +7,6 @@ async function main() {
     try {
         const password = await bcrypt.hash('password123', 10);
         console.log('Seeding users...');
-        await prisma.user.upsert({
-            where: { email: 'staff1@example.com' },
-            update: {},
-            create: {
-                email: 'staff1@example.com',
-                name: 'Staff Satu',
-                password,
-                role: 'employee',
-            },
-        });
-        console.log('Staff 1 seeded');
-        await prisma.user.upsert({
-            where: { email: 'staff2@example.com' },
-            update: {},
-            create: {
-                email: 'staff2@example.com',
-                name: 'Staff Dua',
-                password,
-                role: 'employee',
-            },
-        });
-        console.log('Staff 2 seeded');
-        await prisma.user.upsert({
-            where: { email: 'hrd@example.com' },
-            update: {},
-            create: {
-                email: 'hrd@example.com',
-                name: 'HRD Supervisor',
-                password,
-                role: 'admin',
-            },
-        });
-        console.log('HRD seeded');
         console.log('Seeding companies and zonas...');
         const companyA = await prisma.company.upsert({
             where: { name: 'PT.A' },
@@ -53,6 +20,42 @@ async function main() {
             create: { name: 'PT.B' },
         });
         console.log('Company PT.B seeded');
+        await prisma.user.upsert({
+            where: { email: 'staff1@example.com' },
+            update: {},
+            create: {
+                email: 'staff1@example.com',
+                name: 'Staff Satu',
+                password,
+                role: 'employee',
+                companyId: companyA.id,
+            },
+        });
+        console.log('Staff 1 seeded');
+        await prisma.user.upsert({
+            where: { email: 'staff2@example.com' },
+            update: {},
+            create: {
+                email: 'staff2@example.com',
+                name: 'Staff Dua',
+                password,
+                role: 'employee',
+                companyId: companyA.id,
+            },
+        });
+        console.log('Staff 2 seeded');
+        await prisma.user.upsert({
+            where: { email: 'hrd@example.com' },
+            update: {},
+            create: {
+                email: 'hrd@example.com',
+                name: 'HRD Supervisor',
+                password,
+                role: 'admin',
+                companyId: companyA.id,
+            },
+        });
+        console.log('HRD seeded');
         const zona1 = await prisma.zona.upsert({
             where: { name: 'Kantor Cabang 1' },
             update: {},

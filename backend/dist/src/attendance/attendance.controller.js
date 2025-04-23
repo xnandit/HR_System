@@ -28,6 +28,12 @@ let AttendanceController = class AttendanceController {
         const userId = req.user.sub;
         return this.attendanceService.getAttendanceByUser(userId, date ? new Date(date) : undefined);
     }
+    async getSummary(req, startDate, endDate, userId) {
+        return this.attendanceService.getSummary(req.user, startDate, endDate, userId);
+    }
+    async getEmployeeHistory(req, startDate, endDate, userId) {
+        return this.attendanceService.getEmployeeHistory(req.user, startDate, endDate, userId);
+    }
 };
 exports.AttendanceController = AttendanceController;
 __decorate([
@@ -47,6 +53,26 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], AttendanceController.prototype, "getAttendance", null);
+__decorate([
+    (0, common_1.Get)('summary'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)('startDate')),
+    __param(2, (0, common_1.Query)('endDate')),
+    __param(3, (0, common_1.Query)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, String, String]),
+    __metadata("design:returntype", Promise)
+], AttendanceController.prototype, "getSummary", null);
+__decorate([
+    (0, common_1.Get)('employee-history'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)('startDate')),
+    __param(2, (0, common_1.Query)('endDate')),
+    __param(3, (0, common_1.Query)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, String, String]),
+    __metadata("design:returntype", Promise)
+], AttendanceController.prototype, "getEmployeeHistory", null);
 exports.AttendanceController = AttendanceController = __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Controller)('attendance'),

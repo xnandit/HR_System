@@ -11,6 +11,7 @@ interface AttendanceRecord {
   checkIn?: string | null;
   checkOut?: string | null;
   status?: string | null;
+  workHour?: string | null;
   zona?: { name: string; company?: { name: string } };
   // Optionally, you can add schedule info if backend provides it
 }
@@ -65,24 +66,25 @@ export default function HistoryPage() {
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', background: '#fff', borderRadius: 8, boxShadow: '0 1px 8px #e0e0e0', padding: 32 }}>
+    <div style={{ width: '100%', maxWidth: 1400, margin: '0 auto', background: '#fff', borderRadius: 8, boxShadow: '0 1px 8px #e0e0e0', padding: 32, overflowX: 'unset' }}>
       <h2 style={{ textAlign: 'center', color: '#5fa98a', marginBottom: 16 }}>Riwayat Kehadiran</h2>
       {loading ? (
         <div style={{ textAlign: 'center' }}><Button variant="ghost" disabled>Loading...</Button></div>
       ) : history.length === 0 ? (
         <div style={{ textAlign: 'center', color: '#888' }}>Belum ada riwayat kehadiran.</div>
       ) : (
-        <Card style={{ padding: 0, margin: 0 }}>
-          <Table>
+        <Card style={{ padding: 0, margin: 0, width: '100%' }}>
+          <Table style={{ tableLayout: 'fixed', width: '100%' }}>
             <TableHeader>
               <TableRow>
-                <TableHead>Tanggal</TableHead>
-                <TableHead>Check-in</TableHead>
-                <TableHead>Check-out</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Keterangan</TableHead>
-                <TableHead>Zona</TableHead>
-                <TableHead>Perusahaan</TableHead>
+                <TableHead style={{ textAlign: 'center', width: '13%' }}>Tanggal</TableHead>
+                <TableHead style={{ textAlign: 'center', width: '13%' }}>Check-in</TableHead>
+                <TableHead style={{ textAlign: 'center', width: '13%' }}>Check-out</TableHead>
+                <TableHead style={{ textAlign: 'center', width: '12%' }}>Status</TableHead>
+                <TableHead style={{ textAlign: 'center', width: '15%' }}>Keterangan</TableHead>
+                <TableHead style={{ textAlign: 'center', width: '12%' }}>Jam Kerja</TableHead>
+                <TableHead style={{ textAlign: 'center', width: '12%' }}>Zona</TableHead>
+                <TableHead style={{ textAlign: 'center', width: '10%' }}>Perusahaan</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -92,13 +94,14 @@ export default function HistoryPage() {
                 const jamCheckout = rec.checkOut ? new Date(rec.checkOut).toLocaleTimeString() : '-';
                 return (
                   <TableRow key={rec.id}>
-                    <TableCell>{tanggal}</TableCell>
-                    <TableCell>{jamCheckin}</TableCell>
-                    <TableCell>{rec.checkOut ? jamCheckout : '-'}</TableCell>
-                    <TableCell><StatusPill status={getStatus(rec)} /></TableCell>
-                    <TableCell>{getKeterangan(rec)}</TableCell>
-                    <TableCell>{rec.zona?.name || '-'}</TableCell>
-                    <TableCell>{rec.zona?.company?.name || '-'}</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>{tanggal}</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>{jamCheckin}</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>{rec.checkOut ? jamCheckout : '-'}</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}><StatusPill status={getStatus(rec)} /></TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>{getKeterangan(rec)}</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>{rec.workHour || '-'}</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>{rec.zona?.name || '-'}</TableCell>
+                    <TableCell style={{ textAlign: 'center' }}>{rec.zona?.company?.name || '-'}</TableCell>
                   </TableRow>
                 );
               })}

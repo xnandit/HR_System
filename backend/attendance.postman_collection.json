@@ -3,7 +3,7 @@
     "_postman_id": "attendance-collection-001",
     "name": "Attendance API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Collection untuk testing endpoint absensi user (checkin, checkout, late)"
+    "description": "Collection untuk testing endpoint absensi user (checkin, checkout, late, summary, history, user company, user search)"
   },
   "item": [
     {
@@ -60,6 +60,73 @@
           "raw": "{{base_url}}/attendance",
           "host": ["{{base_url}}"],
           "path": ["attendance"]
+        }
+      }
+    },
+    {
+      "name": "Attendance Summary (Ringkasan)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/attendance/summary?startDate=2025-04-01&endDate=2025-04-30",
+          "host": ["{{base_url}}"],
+          "path": ["attendance", "summary"],
+          "query": [
+            { "key": "startDate", "value": "2025-04-01" },
+            { "key": "endDate", "value": "2025-04-30" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Attendance Employee History",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/attendance/employee-history?startDate=2025-04-01&endDate=2025-04-30",
+          "host": ["{{base_url}}"],
+          "path": ["attendance", "employee-history"],
+          "query": [
+            { "key": "startDate", "value": "2025-04-01" },
+            { "key": "endDate", "value": "2025-04-30" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Company Users (Admin Only)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/user/company",
+          "host": ["{{base_url}}"],
+          "path": ["user", "company"]
+        }
+      }
+    },
+    {
+      "name": "Search User by Name (Admin)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/user/search?name=andi",
+          "host": ["{{base_url}}"],
+          "path": ["user", "search"],
+          "query": [
+            { "key": "name", "value": "andi" }
+          ]
         }
       }
     }

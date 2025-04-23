@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { toZonedTime, fromZonedTime } from 'date-fns-tz';
+import { calculateWorkHour } from '../utils/workhour';
 
 @Injectable()
 export class AttendanceService {
@@ -105,12 +106,123 @@ export class AttendanceService {
   async getAttendanceByUser(userId: number, date?: Date) {
     const where: any = { userId };
     if (date) {
-      where.date = date;
+      // Cari semua attendance pada hari tsb (00:00:00 - 23:59:59)
+      const start = new Date(date);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(date);
+      end.setHours(23, 59, 59, 999);
+      where.date = { gte: start, lte: end };
     }
-    return this.prisma.attendance.findMany({
+    const attendances = await this.prisma.attendance.findMany({
       where,
       orderBy: { date: 'desc' },
       include: { zona: { select: { name: true, company: { select: { name: true } } } } },
+    });
+    // Tambahkan field type dan workHour seperti getEmployeeHistory
+    return attendances.map(att => {
+      let workHour = null;
+      if (att.checkIn && att.checkOut) {
+        workHour = calculateWorkHour(att.checkIn, att.checkOut);
+      }
+      return {
+        ...att,
+        type: att.checkOut ? 'checkout' : (att.status === 'late' ? 'late' : 'checkin'),
+        workHour,
+      };
+    });
+  }
+
+  async getSummary(user: any, startDate?: string, endDate?: string, userId?: string) {
+    const where: any = {};
+    if (startDate && endDate) {
+      // Ambil semua zona yang relevan untuk user ini
+      let zonaSchedules = [];
+      if (user.role === 'admin') {
+        zonaSchedules = await this.prisma.zonaSchedule.findMany({
+          where: { zona: { companyId: user.companyId } },
+          select: { timezone: true, zonaId: true }
+        });
+      } else {
+        // Ambil zona yang pernah dihadiri user
+        zonaSchedules = await this.prisma.zonaSchedule.findMany({
+          where: { zona: { attendances: { some: { userId: user.id } } } },
+          select: { timezone: true, zonaId: true }
+        });
+      }
+      // Buat filter OR berdasarkan timezone masing-masing zona
+      const dateFilters = zonaSchedules.map(zs => {
+        const offset = zs.timezone ?? 7;
+        const start = new Date(`${startDate}T00:00:00+${offset.toString().padStart(2, '0')}:00`);
+        const end = new Date(`${endDate}T23:59:59.999+${offset.toString().padStart(2, '0')}:00`);
+        return { zonaId: zs.zonaId, date: { gte: start, lte: end } };
+      });
+      if (dateFilters.length > 0) {
+        where.OR = dateFilters;
+      }
+    }
+    if (user.role === 'admin') {
+      where.companyId = user.companyId;
+      if (userId) where.userId = Number(userId);
+    } else {
+      where.userId = user.id;
+    }
+    const [onTime, late] = await Promise.all([
+      this.prisma.attendance.count({ where: { ...where, status: 'on-time' } }),
+      this.prisma.attendance.count({ where: { ...where, status: 'late' } })
+    ]);
+    // Absent: user yang tidak punya attendance pada tanggal tsb, bisa dihandle di frontend atau logic khusus
+    return { onTime, late, absent: 0 };
+  }
+
+  async getEmployeeHistory(user: any, startDate?: string, endDate?: string, userId?: string) {
+    const where: any = {};
+    if (startDate && endDate) {
+      // Ambil semua zona yang relevan untuk user ini
+      let zonaSchedules = [];
+      if (user.role === 'admin') {
+        zonaSchedules = await this.prisma.zonaSchedule.findMany({
+          where: { zona: { companyId: user.companyId } },
+          select: { timezone: true, zonaId: true }
+        });
+      } else {
+        // Ambil zona yang pernah dihadiri user
+        zonaSchedules = await this.prisma.zonaSchedule.findMany({
+          where: { zona: { attendances: { some: { userId: user.id } } } },
+          select: { timezone: true, zonaId: true }
+        });
+      }
+      // Buat filter OR berdasarkan timezone masing-masing zona
+      const dateFilters = zonaSchedules.map(zs => {
+        const offset = zs.timezone ?? 7;
+        const start = new Date(`${startDate}T00:00:00+${offset.toString().padStart(2, '0')}:00`);
+        const end = new Date(`${endDate}T23:59:59.999+${offset.toString().padStart(2, '0')}:00`);
+        return { zonaId: zs.zonaId, date: { gte: start, lte: end } };
+      });
+      if (dateFilters.length > 0) {
+        where.OR = dateFilters;
+      }
+    }
+    if (user.role === 'admin') {
+      where.companyId = user.companyId;
+      if (userId) where.userId = Number(userId);
+    } else {
+      where.userId = user.id;
+    }
+    const attendances = await this.prisma.attendance.findMany({
+      where,
+      include: { user: { select: { name: true, email: true, role: true } }, zona: { select: { id: true, name: true, companyId: true, schedules: true } } },
+      orderBy: { date: 'desc' }
+    });
+    // Tambahkan perhitungan jam kerja (workHour) di backend
+    return attendances.map((att) => {
+      let workHour = null;
+      if (att.checkIn && att.checkOut) {
+        workHour = calculateWorkHour(att.checkIn, att.checkOut);
+      }
+      return {
+        ...att,
+        workHour,
+      };
     });
   }
 }

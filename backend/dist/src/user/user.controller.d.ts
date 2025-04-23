@@ -27,4 +27,16 @@ export declare class UserController {
         name: string;
         role: string;
     }>;
+    getCompanyUsers(req: Request): Promise<{
+        id: number;
+        email: string;
+        name: string;
+        role: string;
+    }[]>;
+    searchUser(req: Request, name: string): Promise<{
+        id: number;
+        email: string;
+        name: string;
+        role: string;
+    }[]>;
 }

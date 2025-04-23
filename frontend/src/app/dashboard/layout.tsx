@@ -1,11 +1,13 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import styles from "./dashboard.module.css";
+import { Button } from "@/components/ui/button";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [role, setRole] = useState<string | null>(null);
 
   // Proteksi route: redirect ke login jika tidak ada token
@@ -45,6 +47,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       { label: "Kehadiran", href: "/dashboard/attendance" },
       { label: "Profil", href: "/dashboard/profile" },
     ];
+  } else {
+    // Default menu (optional)
+    menu = [
+      { label: "Ringkasan Laporan", href: "/dashboard/history" },
+      { label: "Kehadiran", href: "/dashboard/attendance" },
+      { label: "Profil", href: "/dashboard/profile" },
+    ];
   }
 
   return (
@@ -53,12 +62,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className={styles.logo}>Appsensi</div>
         <nav className={styles.menu}>
           {menu.map((item) => (
-            <Link key={item.href} href={item.href} className={styles.menuItem}>
+            <Link
+              key={item.href}
+              href={item.href}
+              className={[
+                styles.menuItem,
+                pathname.startsWith(item.href) ? styles.active : ""
+              ].filter(Boolean).join(" ")}
+            >
               {item.label}
             </Link>
           ))}
         </nav>
-        <button className={styles.logoutBtn} onClick={handleLogout} style={{ margin: 24 }}>Logout</button>
+        <Button className={styles.logoutBtn} onClick={handleLogout} style={{ margin: 24 }}>
+          Logout
+        </Button>
       </aside>
       <main className={styles.mainContent}>{children}</main>
     </div>

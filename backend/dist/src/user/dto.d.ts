@@ -3,6 +3,7 @@ export declare class RegisterDto {
     password: string;
     name: string;
     role?: string;
+    companyId: number;
 }
 export declare class LoginDto {
     email: string;

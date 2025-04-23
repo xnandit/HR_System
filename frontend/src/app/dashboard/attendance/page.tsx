@@ -109,8 +109,36 @@ export default function AttendancePage() {
       ) : (
         <>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 24 }}>
-            <Button onClick={() => setAbsenType('checkin')} disabled={absenType === 'checkin'}>Check In</Button>
-            <Button onClick={() => setAbsenType('checkout')} disabled={absenType === 'checkout' || !checkoutEnabled}>Check Out</Button>
+            <Button
+              onClick={() => setAbsenType('checkin')}
+              disabled={alreadyCheckedIn || alreadyCheckedOut}
+              style={{
+                background: (alreadyCheckedIn || alreadyCheckedOut) ? '#b0b0b0' : '#3498db',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 4,
+                fontWeight: 500,
+                cursor: (alreadyCheckedIn || alreadyCheckedOut) ? 'not-allowed' : 'pointer',
+                opacity: (alreadyCheckedIn || alreadyCheckedOut) ? 0.7 : 1,
+              }}
+            >
+              Check In
+            </Button>
+            <Button
+              onClick={() => setAbsenType('checkout')}
+              disabled={!alreadyCheckedIn || alreadyCheckedOut}
+              style={{
+                background: (!alreadyCheckedIn || alreadyCheckedOut) ? '#b0b0b0' : '#3498db',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 4,
+                fontWeight: 500,
+                cursor: (!alreadyCheckedIn || alreadyCheckedOut) ? 'not-allowed' : 'pointer',
+                opacity: (!alreadyCheckedIn || alreadyCheckedOut) ? 0.7 : 1,
+              }}
+            >
+              Check Out
+            </Button>
           </div>
           <button
             style={{ marginBottom: 12, background: '#e0c13b', color: '#333', border: 'none', borderRadius: 4, padding: '8px 24px', display: 'block', marginLeft: 'auto', marginRight: 'auto', fontWeight: 500, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}
@@ -120,11 +148,11 @@ export default function AttendancePage() {
             BYPASS QR (DEV ONLY)
           </button>
           <button
-            style={{ marginBottom: 24, background: '#5fa98a', color: '#fff', border: 'none', borderRadius: 4, padding: '8px 24px', display: 'block', marginLeft: 'auto', marginRight: 'auto', fontWeight: 500 }}
-            onClick={() => setShowScanner(true)}
+            style={{ marginBottom: 24, background: showScanner ? '#e57373' : '#5fa98a', color: '#fff', border: 'none', borderRadius: 4, padding: '8px 24px', display: 'block', marginLeft: 'auto', marginRight: 'auto', fontWeight: 500 }}
+            onClick={() => setShowScanner((prev) => !prev)}
             disabled={loading}
           >
-            Tampilkan Scan QR
+            {showScanner ? 'Tutup Scan QR' : 'Tampilkan Scan QR'}
           </button>
           {showScanner && (
             <>

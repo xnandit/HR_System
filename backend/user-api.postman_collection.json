@@ -60,7 +60,45 @@
           "path": ["user", "profile"]
         }
       }
+    },
+    {
+      "name": "Get Company Users (Admin Only)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/user/company",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["user", "company"]
+        }
+      }
+    },
+    {
+      "name": "Search User by Name (Admin)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{access_token}}" }
+        ],
+        "url": {
+          "raw": "http://localhost:3000/user/search?name=andi",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["user", "search"],
+          "query": [
+            { "key": "name", "value": "andi" }
+          ]
+        }
+      }
     }
   ],
-  "event": []
+  "event": [],
+  "variable": [
+    { "key": "access_token", "value": "" }
+  ]
 }
